@@ -22,3 +22,9 @@ def test_shortlist_csv_has_header():
     r = client.get("/api/shortlist.csv")
     assert r.status_code == 200
     assert r.text.splitlines()[0].startswith("code,kind,licence_type")
+
+
+def test_summary_counts_only_licences_not_processing_sites():
+    s = client.get("/api/summary").json()
+    assert s["lithium_by_kind"].keys() <= {"large_exploration", "small_exploration", "mining", "application"}
+    assert s["licences_and_applications"] == 1731 + 1409 + 7468 + 4110

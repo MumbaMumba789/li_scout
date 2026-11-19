@@ -7,7 +7,7 @@
   const map = L.map("map", { preferCanvas: true }).setView([-13.1, 27.8], 6);
   L.control.scale({ imperial: false }).addTo(map);
 
-  const layers = { border: null, ground: L.layerGroup().addTo(map) };
+  const layers = { border: null, ground: L.layerGroup().addTo(map), processing: L.layerGroup() };
   const byCode = new Map();
   let active = null;
 
@@ -137,6 +137,19 @@
   $("tLithium").addEventListener("change", () => { $("tLithium").checked = true; loadGround(); });
   $("tOpening").addEventListener("change", loadGround);
   $("tAll").addEventListener("change", loadGround);
+  async function loadProcessing() {
+    layers.processing.clearLayers();
+    if (!$("tProcessing").checked) { map.removeLayer(layers.processing); return; }
+    try {
+      const fc = await (await fetch("api/licences?kind=processing")).json();
+      L.geoJSON(fc, {
+        style: { color: "#1f5f8b", weight: 2, fillColor: "#1f5f8b", fillOpacity: 0.35 },
+        onEachFeature: (f, layer) => layer.bindTooltip(f.properties.code || "Processing site"),
+      }).eachLayer(l => layers.processing.addLayer(l));
+      layers.processing.addTo(map);
+    } catch (e) { /* optional layer */ }
+  }
+  $("tProcessing").addEventListener("change", loadProcessing);
   $("tBorder").addEventListener("change", () => {
     if (!layers.border) return;
     $("tBorder").checked ? layers.border.addTo(map) : map.removeLayer(layers.border);

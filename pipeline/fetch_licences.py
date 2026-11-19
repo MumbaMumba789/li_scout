@@ -21,6 +21,7 @@ LAYERS = {
     "mmmd:04:smallscale-exploration": "small_exploration",
     "mmmd:00:activelicenses-mines": "mining",
     "mmmd:lfapplications": "application",
+    "mmmd:03:mineral-processing": "processing",
 }
 
 # Minerals that occur with lithium pegmatites (exact, case-insensitive match on each listed commodity).

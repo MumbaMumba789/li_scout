@@ -34,7 +34,7 @@ def meta():
 @app.get("/api/summary")
 def summary():
     t = today()
-    feats = [analysis.annotate(f, t)["properties"] for f in all_features()]
+    feats = [analysis.annotate(f, t)["properties"] for f in all_features() if f["properties"].get("kind") != "processing"]
     lith = [p for p in feats if p["lithium_listed"]]
     return {
         "licences_and_applications": len(feats),

@@ -64,6 +64,10 @@ def annotate(feature: dict, today: date) -> dict:
     """
     props = dict(feature["properties"])
     props["lithium_listed"] = has_lithium(props)
+    if props.get("kind") == "processing":
+        # Processing sites are context, not licences: no licence rules apply.
+        props.update(opening_reasons=[], opening_soon=False, contested=False)
+        return {"type": "Feature", "geometry": feature["geometry"], "properties": props}
     all_reasons = reasons(props, today)
     props["contested"] = is_contested(props)
     props["opening_reasons"] = [r for r in all_reasons if not r.startswith(CONTESTED_PREFIX)]

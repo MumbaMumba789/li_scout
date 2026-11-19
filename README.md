@@ -15,7 +15,13 @@ A licence lists the commodities it is held for. Many list several minerals, so a
 
 ## Run it
 
-Needs Python 3.10 or newer.
+Needs Python 3.10 or newer. The quickest way:
+
+    ./run.sh
+
+Then open http://localhost:8000 (landing page) or http://localhost:8000/map.html (map).
+
+To set it up by hand:
 
     cd backend
     python3 -m venv .venv
@@ -50,7 +56,8 @@ The script reads the Survey's public WFS (geoserverprd.gsb.gov.zm). It takes a f
 
 ## Not in this version yet
 
-- Geology: the prospectivity signal is currently only the licence commodity list. A geology layer (lithology, pegmatite outcrops) is the next data source.
+- Geology: the prospectivity signal is currently only the licence commodity list. The Survey's public GeoServer and portal have no geology layer that this environment can reach, so a geology source is still needed.
+- Mineral processing sites are shown as context only (172 features from the Survey's GeoServer).
 - Satellite change detection: the imagery hosts are not reachable from the current environment.
 - AI: planned for a later step, after the data layers are in place.
 - Field checks: nothing has been verified on the ground.
