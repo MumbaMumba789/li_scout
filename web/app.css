@@ -1,0 +1,42 @@
+:root {
+  --primary: #2b9348;
+  --primary-dark: #217338;
+  --primary-soft: #e6f3ea;
+  --ink: #1f2933;
+  --muted: #5b6573;
+  --line: #d9dfe7;
+  --paper: #ffffff;
+  --page: #f6f8f7;
+  --amber: #b26a00;
+  --slate: #8a96a3;
+  --radius: 8px;
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0; font-family: "Segoe UI", system-ui, -apple-system, Roboto, Helvetica, Arial, sans-serif;
+  color: var(--ink); background: var(--page); font-size: 16px; line-height: 1.55;
+}
+a { color: var(--primary-dark); }
+h1, h2, h3 { color: var(--ink); line-height: 1.2; margin: 0 0 .5em; }
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 44px; padding: 10px 18px; border-radius: var(--radius); border: 1px solid transparent;
+  font: inherit; font-weight: 600; text-decoration: none; cursor: pointer;
+}
+.btn.primary { background: var(--primary); color: #fff; }
+.btn.primary:hover { background: var(--primary-dark); }
+.btn.outline { background: var(--paper); color: var(--primary-dark); border-color: var(--primary); }
+.btn.outline:hover { background: var(--primary-soft); }
+.btn:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible {
+  outline: 3px solid #9fd8ae; outline-offset: 2px;
+}
+.topbar {
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  height: 60px; padding: 0 24px; background: var(--primary); color: #fff;
+}
+.brand { color: #fff; font-weight: 700; font-size: 1.15rem; text-decoration: none; letter-spacing: .01em; }
+.brand small { font-weight: 400; opacity: .85; margin-left: 6px; font-size: .9rem; }
+.topbar nav a { color: #fff; text-decoration: none; margin-left: 18px; font-weight: 600; opacity: .95; }
+.topbar nav a:hover { text-decoration: underline; }
+.footer { color: var(--muted); font-size: .85rem; padding: 24px; text-align: center; border-top: 1px solid var(--line); background: var(--paper); }

@@ -1,29 +1,60 @@
-# CellCheck
+# LiScout Zambia
 
-CellCheck is a web app that tells people whether a used lithium-ion cell can be reused, is weak, or should be recycled. The user uploads or enters discharge readings (time in minutes, voltage in volts) and gets a grade with a plain-language reason.
+LiScout helps small-scale prospectors and junior exploration geologists in Zambia find lithium-bearing ground that is about to open. It reads the public Ministry of Mines licence register (published by the Geological Survey of Zambia) and shows:
 
-Status: prototype. The front end is built. The grading in `app.js` (`estimate()`) is a placeholder and will be replaced by the trained model.
+- which licences and applications list lithium, or the pegmatite minerals that occur with it (tantalum, tin, beryllium, caesium, niobium, tourmaline);
+- which of that ground is **opening soon**: granted licences that are lapsing, expired, or not in good standing;
+- which ground is **contested**: pending applications for the same ground;
+- a soonest-first **shortlist** you can download as a CSV for a field visit.
+
+Status: prototype. The data comes straight from the register. Nothing has been checked on the ground yet.
+
+## What a licence listing lithium does and does not mean
+
+A licence lists the commodities it is held for. Many list several minerals, so a listing shows that lithium is claimed on that ground, not that a deposit has been found. Dates and status come from the register and can be out of date, so the app asks you to check the register when a past expiry date still shows an active status.
 
 ## Run it
 
-Open `index.html` in a browser, or serve the folder:
+Needs Python 3.10 or newer.
 
-    python3 -m http.server 8000
+    cd backend
+    python3 -m venv .venv
+    . .venv/bin/activate
+    pip install -r requirements.txt
+    uvicorn liscout.main:app --reload --port 8000
 
-Then visit http://localhost:8000.
+Then open http://localhost:8000 (landing page) or http://localhost:8000/map.html (map). API docs are at /api/docs.
 
-## CSV format
+The map loads Leaflet from cdnjs, so the browser needs internet access.
 
-Two columns, no header required: time in minutes, then voltage in volts. Example:
+## Refresh the data
 
-    0,4.20
-    10,4.05
-    20,3.85
-    30,3.60
-    40,3.30
+The licence data is already in `data/licences.geojson`. To pull the latest register:
 
-## Files
+    python3 pipeline/fetch_licences.py
 
-- `index.html`: the three screens (home/upload, data entry, result).
-- `styles.css`: colours and layout; works on phones.
-- `app.js`: CSV parsing, the entry table, the discharge curve, and the placeholder `estimate()`.
+The script reads the Survey's public WFS (geoserverprd.gsb.gov.zm). It takes a few minutes and writes the file again.
+
+## Tests
+
+    cd backend
+    .venv/bin/python -m pytest -q
+
+## Layout
+
+- `pipeline/fetch_licences.py`: downloads the cadastre layers and writes one GeoJSON file.
+- `backend/liscout/analysis.py`: the rules for "opening soon", "contested" and the shortlist. Pure Python, tested.
+- `backend/liscout/main.py`: the API (summary, licences, shortlist, CSV) and the static pages.
+- `web/`: the landing page (`index.html`) and the map (`map.html`, `map.js`), styled in `app.css`. Primary colour `#2b9348`.
+- `data/licences.geojson`: the register extract the app reads.
+
+## Not in this version yet
+
+- Geology: the prospectivity signal is currently only the licence commodity list. A geology layer (lithology, pegmatite outcrops) is the next data source.
+- Satellite change detection: the imagery hosts are not reachable from the current environment.
+- AI: planned for a later step, after the data layers are in place.
+- Field checks: nothing has been verified on the ground.
+
+## Data source
+
+Geological Survey of Zambia / Ministry of Mines cadastre, public WFS (`geoserverprd.gsb.gov.zm`). Boundary: Zambia border layer from the same service.

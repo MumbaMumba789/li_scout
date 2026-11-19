@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LiScout map</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Ccircle cx=%2216%22 cy=%2216%22 r=%2213%22 fill=%22%232b9348%22/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css">
+  <link rel="stylesheet" href="app.css">
+  <style>
+    html, body { height: 100%; overflow: hidden; }
+    .shell { display: grid; grid-template-columns: 360px 1fr; height: calc(100% - 60px); }
+    aside.side { background: var(--paper); border-right: 1px solid var(--line); overflow-y: auto; padding: 18px; }
+    #map { height: 100%; width: 100%; }
+    .side h2 { font-size: 1rem; color: var(--primary-dark); margin: 18px 0 8px; }
+    .side h2:first-child { margin-top: 0; }
+    .note { color: var(--muted); font-size: .85rem; margin: 6px 0 0; }
+    .toggles label { display: flex; gap: 10px; align-items: center; margin: 6px 0; font-weight: 500; cursor: pointer; }
+    .toggles input { width: 18px; height: 18px; accent-color: var(--primary); }
+    .counts { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .count { background: var(--primary-soft); border-radius: var(--radius); padding: 10px; }
+    .count b { display: block; font-size: 1.3rem; color: var(--primary-dark); }
+    .count span { font-size: .85rem; color: var(--muted); }
+    .shortlist { list-style: none; padding: 0; margin: 0; }
+    .shortlist li { border: 1px solid var(--line); border-radius: var(--radius); padding: 10px 12px; margin-bottom: 8px; cursor: pointer; background: var(--paper); }
+    .shortlist li:hover, .shortlist li.on { border-color: var(--primary); background: var(--primary-soft); }
+    .shortlist .code { font-weight: 700; font-size: .95rem; }
+    .shortlist .why { color: var(--muted); font-size: .85rem; }
+    .details { border: 1px solid var(--primary); border-radius: var(--radius); padding: 14px; margin-top: 14px; background: var(--primary-soft); font-size: .95rem; }
+    .details dl { display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; margin: 0; }
+    .details dt { color: var(--muted); }
+    .details dd { margin: 0; }
+    .empty { color: var(--muted); font-size: .92rem; }
+    .legend { position: absolute; bottom: 18px; right: 18px; z-index: 500; background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius); padding: 10px 12px; font-size: .85rem; }
+    .legend div { display: flex; gap: 8px; align-items: center; margin: 3px 0; }
+    .sw { width: 16px; height: 10px; border-radius: 2px; display: inline-block; }
+    .banner { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); z-index: 500; background: #fff3d6; color: #6b4300; border: 1px solid #e8c77a; border-radius: var(--radius); padding: 8px 12px; font-size: .9rem; display: none; }
+    @media (max-width: 800px) {
+      html, body { overflow: auto; }
+      .shell { grid-template-columns: 1fr; height: auto; }
+      #map { height: 60vh; }
+      aside.side { border-right: 0; border-top: 1px solid var(--line); overflow: visible; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="index.html">LiScout<small>Zambia</small></a>
+    <nav><a href="index.html">About</a></nav>
+  </header>
+
+  <div class="shell">
+    <aside class="side">
+      <h2>What you are looking at</h2>
+      <p class="note">Mining licences and applications from the Ministry of Mines register. Lithium is shown when a licence lists it. That is not proof of a deposit.</p>
+
+      <h2>Summary</h2>
+      <div class="counts">
+        <div class="count"><b id="cLithium">–</b><span>listing lithium</span></div>
+        <div class="count"><b id="cOpening">–</b><span>lithium, opening soon</span></div>
+      </div>
+
+      <h2>Show on the map</h2>
+      <div class="toggles">
+        <label><input type="checkbox" id="tLithium" checked> Lithium-listed ground</label>
+        <label><input type="checkbox" id="tOpening"> Only ground opening soon</label>
+        <label><input type="checkbox" id="tAll"> Also show all other ground (slower)</label>
+        <label><input type="checkbox" id="tBorder" checked> Zambia border</label>
+      </div>
+
+      <h2 id="shortlist">Shortlist: soonest first</h2>
+      <p class="note">Lithium-listed ground that is opening soon. Click one to see it on the map.</p>
+      <p style="margin:10px 0"><a class="btn outline" href="api/shortlist.csv" style="min-height:36px;padding:6px 12px;font-size:.92rem">Download CSV</a></p>
+      <ul class="shortlist" id="list"></ul>
+
+      <div class="details" id="details" hidden></div>
+    </aside>
+
+    <main style="position:relative">
+      <div id="map" role="region" aria-label="Map of licences in Zambia"></div>
+      <div class="banner" id="banner"></div>
+      <div class="legend">
+        <div><span class="sw" style="background:#2b9348"></span>Lithium listed</div>
+        <div><span class="sw" style="background:#b26a00"></span>Opening soon</div>
+        <div><span class="sw" style="background:#8a96a3"></span>Other ground</div>
+        <div><span class="sw" style="border:2px dashed #b26a00;background:transparent"></span>Application</div>
+      </div>
+    </main>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+  <script src="map.js"></script>
+</body>
+</html>
