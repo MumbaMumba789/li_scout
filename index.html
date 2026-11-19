@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CellCheck</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect x=%229%22 y=%224%22 width=%2214%22 height=%2225%22 rx=%223%22 fill=%22%232ecc40%22/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#home" aria-label="CellCheck home">
+      <svg class="brand-icon" viewBox="0 0 32 32" aria-hidden="true">
+        <rect x="9" y="4" width="14" height="25" rx="3" fill="#2ecc40"/>
+        <rect x="13" y="1.5" width="6" height="3" rx="1" fill="#2ecc40"/>
+        <path d="M16 11c-3 3-4 6-1 10 2-3 3-6 1-10z" fill="#fff"/>
+      </svg>
+      <span class="brand-name"><span>Cell</span><span class="brand-accent">Check</span></span>
+    </a>
+    <button class="ghost" data-go="home" type="button" hidden id="newTest">New test</button>
+  </header>
+
+  <main>
+    <!-- Screen 1: home / upload -->
+    <section class="screen" id="screen-home" data-screen="home">
+      <div class="hero">
+        <div class="hero-art" aria-hidden="true">
+          <svg viewBox="0 0 200 220">
+            <circle cx="100" cy="110" r="92" fill="#e4edfb"/>
+            <rect x="62" y="30" width="62" height="150" rx="10" fill="#2ecc40" transform="rotate(-8 93 105)"/>
+            <rect x="82" y="16" width="22" height="12" rx="3" fill="#1e5fa8" transform="rotate(-8 93 22)"/>
+            <path d="M90 95c-10 12-12 22-3 34 8-12 10-22 3-34z" fill="#fff"/>
+            <circle cx="150" cy="150" r="24" fill="none" stroke="#1e3a5f" stroke-width="7"/>
+            <line x1="167" y1="167" x2="186" y2="186" stroke="#1e3a5f" stroke-width="9" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <h1><span>Cell</span><span class="brand-accent">Check</span></h1>
+        <p class="lead">Find out if your used lithium-ion cells can be reused, are weak, or should be recycled.</p>
+        <button class="btn primary big" id="uploadBtn" type="button">
+          <span class="btn-title">Upload CSV</span>
+          <span class="btn-sub">Discharge readings</span>
+        </button>
+        <input type="file" id="fileInput" accept=".csv,text/csv" hidden>
+        <div class="or"><span>or</span></div>
+        <button class="btn outline big" data-go="entry" type="button">Enter readings manually</button>
+        <p class="error" id="uploadError" role="alert" hidden></p>
+      </div>
+    </section>
+
+    <!-- Screen 2: data entry -->
+    <section class="screen" id="screen-entry" data-screen="entry" hidden>
+      <div class="page-head">
+        <h2>Enter discharge data</h2>
+        <p>Add the voltage readings over time, and optionally the cell details.</p>
+      </div>
+      <form id="entryForm" novalidate>
+        <div class="entry-grid">
+          <fieldset class="card">
+            <legend>Cell details (optional)</legend>
+            <label>Brand <input name="brand" placeholder="e.g. Samsung"></label>
+            <label>Chemistry
+              <select name="chemistry">
+                <option value="">Not sure</option>
+                <option>Li-ion</option>
+                <option>LFP</option>
+                <option>NMC</option>
+                <option>LCO</option>
+              </select>
+            </label>
+            <label>Nominal capacity (mAh) <input name="capacity" inputmode="numeric" placeholder="e.g. 2000"></label>
+            <label>Age (months) <input name="age" inputmode="numeric" placeholder="e.g. 12"></label>
+          </fieldset>
+
+          <fieldset class="card">
+            <legend>Voltage over time</legend>
+            <div class="table-wrap">
+              <table id="readingsTable">
+                <thead><tr><th>Time (min)</th><th>Voltage (V)</th><th><span class="sr-only">Remove</span></th></tr></thead>
+                <tbody></tbody>
+              </table>
+            </div>
+            <button class="btn outline small" id="addRow" type="button">+ Add row</button>
+            <p class="error" id="entryError" role="alert" hidden></p>
+          </fieldset>
+        </div>
+        <div class="actions">
+          <button class="btn outline" data-go="home" type="button">Back</button>
+          <button class="btn primary" type="submit">Get result</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- Screen 3: result -->
+    <section class="screen" id="screen-result" data-screen="result" hidden>
+      <div class="result-grid">
+        <div class="grade" id="gradeBox">
+          <svg class="grade-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 19l-3-5 2-3.5M17 19h3l-3-5-2-3.5M9 5l3-2 3 2M12 3v4M9 16h6l-2 3M9 16l3-5M15 16l-3-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <div class="grade-label" id="gradeLabel">Reuse</div>
+          <div class="grade-sub" id="gradeSub">Good condition</div>
+        </div>
+        <div class="stat card">
+          <div class="stat-name">Estimated remaining capacity</div>
+          <div class="stat-value" id="capacityValue">–</div>
+        </div>
+        <div class="stat card">
+          <div class="stat-name">Health</div>
+          <div class="stat-value" id="healthValue">–</div>
+        </div>
+        <p class="reason card" id="reasonText"></p>
+        <div class="card chart-card">
+          <div class="chart-title">Discharge curve</div>
+          <svg id="curve" viewBox="0 0 360 200" role="img" aria-label="Discharge curve"></svg>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="btn outline" data-go="entry" type="button">Edit readings</button>
+        <button class="btn primary" data-go="home" type="button">New test</button>
+      </div>
+    </section>
+
+    <p class="disclaimer">Prototype. Results are guidance, not laboratory measurements.</p>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
