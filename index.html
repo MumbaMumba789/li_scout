@@ -23,26 +23,16 @@
   <main>
     <!-- Screen 1: home / upload -->
     <section class="screen" id="screen-home" data-screen="home">
-      <div class="hero">
-        <div class="hero-art" aria-hidden="true">
-          <svg viewBox="0 0 200 220">
-            <circle cx="100" cy="110" r="92" fill="#e4edfb"/>
-            <rect x="62" y="30" width="62" height="150" rx="10" fill="#2ecc40" transform="rotate(-8 93 105)"/>
-            <rect x="82" y="16" width="22" height="12" rx="3" fill="#1e5fa8" transform="rotate(-8 93 22)"/>
-            <path d="M90 95c-10 12-12 22-3 34 8-12 10-22 3-34z" fill="#fff"/>
-            <circle cx="150" cy="150" r="24" fill="none" stroke="#1e3a5f" stroke-width="7"/>
-            <line x1="167" y1="167" x2="186" y2="186" stroke="#1e3a5f" stroke-width="9" stroke-linecap="round"/>
-          </svg>
-        </div>
-        <h1><span>Cell</span><span class="brand-accent">Check</span></h1>
+      <div class="intro">
+        <h1>CellCheck</h1>
         <p class="lead">Find out if your used lithium-ion cells can be reused, are weak, or should be recycled.</p>
         <button class="btn primary big" id="uploadBtn" type="button">
-          <span class="btn-title">Upload CSV</span>
-          <span class="btn-sub">Discharge readings</span>
+          <span class="btn-title">Upload a CSV file</span>
+          <span class="btn-sub">Time in minutes and voltage in volts</span>
         </button>
         <input type="file" id="fileInput" accept=".csv,text/csv" hidden>
         <div class="or"><span>or</span></div>
-        <button class="btn outline big" data-go="entry" type="button">Enter readings manually</button>
+        <button class="btn outline big" data-go="entry" type="button">Enter readings by hand</button>
         <p class="error" id="uploadError" role="alert" hidden></p>
       </div>
     </section>
@@ -109,7 +99,7 @@
         <p class="reason card" id="reasonText"></p>
         <div class="card chart-card">
           <div class="chart-title">Discharge curve</div>
-          <svg id="curve" viewBox="0 0 360 200" role="img" aria-label="Discharge curve"></svg>
+          <svg id="curve" viewBox="0 0 640 260" role="img" aria-label="Discharge curve"></svg>
         </div>
       </div>
       <div class="actions">

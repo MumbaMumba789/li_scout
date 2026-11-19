@@ -96,7 +96,7 @@
 
   function drawCurve(readings) {
     const svg = document.getElementById("curve");
-    const W = 360, H = 200, L = 44, R = 12, T = 12, B = 34;
+    const W = 640, H = 260, L = 44, R = 12, T = 12, B = 34;
     const xs = readings.map(r => r.minutes), ys = readings.map(r => r.volts);
     const x0 = Math.min(...xs), x1 = Math.max(...xs, x0 + 1);
     const y0 = Math.floor(Math.min(...ys) * 10) / 10 - 0.1, y1 = Math.ceil(Math.max(...ys) * 10) / 10 + 0.1;
